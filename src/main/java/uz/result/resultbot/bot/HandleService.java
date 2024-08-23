@@ -13,6 +13,11 @@ import uz.result.resultbot.service.BasketService;
 import uz.result.resultbot.service.CommercialOfferService;
 import uz.result.resultbot.service.UserService;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -378,7 +383,67 @@ public class HandleService {
         );
         sendMessage.setParseMode("Markdown");
         bot.execute(sendMessage);
+
+
+        String jsonBody = createNotionJson(application);
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request1 = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.notion.com/v1/pages"))
+                .header("Authorization", "Bearer " + "secret_lnLNl6lfhuBnnZmYOlg6tUGXUv8VjxmnDCffo0wwKJS")
+                .header("Content-Type", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+
+        try {
+            client.send(request1, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+
     }
+
+
+
+
+    //
+
+    public String createNotionJson(Application  application) {
+        return "{"
+                + "\"parent\": { \"database_id\": \"" + "2b43ccc3b4af4e53a8e6802fb3f7fcfb" + "\" },"
+                + "\"properties\": {"
+                + "\"Name\": {"
+                + "\"title\": [{ \"text\": { \"content\": \"" + escapeJson(application.getFullName()) + "\" } }]"
+                + "},"
+                + "\"Type of Service\": {"
+                + "\"rich_text\": [{ \"text\": { \"content\": \"" + escapeJson(application.getService().toString()) + "\" } }]"
+                + "},"
+                + "\"Phone\": {"
+                + "\"phone_number\": \"" + application.getPhoneNumber() + "\""
+                + "}"
+                + "}"
+                + "}";
+    }
+
+
+    public static String escapeJson(String value) {
+        if (value == null) {
+            return null;
+        }
+        // JSON maxsus belgilarini o'zlashtirish
+        return value.replace("\"", "\\\"")
+                .replace("\\", "\\\\")
+                .replace("/", "\\/")
+                .replace("\b", "\\b")
+                .replace("\f", "\\f")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
+    }
+
+    //
 
     @SneakyThrows
     public void basketOperationMessageHandler(Long chatId, TelegramLongPollingBot bot) {
@@ -651,6 +716,10 @@ public class HandleService {
         );
         sendMessage.setParseMode("Markdown");
         bot.execute(sendMessage);
+
+
     }
+
+
 
 }
