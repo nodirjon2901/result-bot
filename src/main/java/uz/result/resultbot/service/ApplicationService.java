@@ -1,6 +1,8 @@
 package uz.result.resultbot.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uz.result.resultbot.bot.UserSession;
 import uz.result.resultbot.model.Application;
@@ -13,6 +15,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ApplicationService {
+
+    private final Logger logger = LoggerFactory.getLogger(ApplicationService.class);
 
     private final ApplicationRepository applicationRepository;
 
@@ -28,7 +32,10 @@ public class ApplicationService {
 
     public Application update(Application application) {
         Application oldApp = applicationRepository.findById(application.getId())
-                .orElseThrow(() -> new RuntimeException("Application is not found by id: " + application.getId()));
+                .orElseThrow(() -> {
+                    logger.warn("Application is not found by ID: {}", application.getId());
+                    return new RuntimeException("Application is not found by id: " + application.getId());
+                });
         oldApp.setId(oldApp.getId());
         oldApp.setService(application.getService());
         oldApp.setFullName(application.getFullName());

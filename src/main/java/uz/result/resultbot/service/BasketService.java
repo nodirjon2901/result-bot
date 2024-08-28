@@ -1,7 +1,8 @@
 package uz.result.resultbot.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uz.result.resultbot.bot.UserSession;
 import uz.result.resultbot.model.Basket;
@@ -13,6 +14,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class BasketService {
+
+    private final Logger logger = LoggerFactory.getLogger(BasketService.class);
 
     private final BasketRepository basketRepository;
 
@@ -27,7 +30,10 @@ public class BasketService {
 
     public Basket update(Basket basket) {
         Basket oldBasket = basketRepository.findById(basket.getId())
-                .orElseThrow(() -> new RuntimeException("Basket is not found by id: " + basket.getId()));
+                .orElseThrow(() -> {
+                    logger.warn("Basket is not found by ID: {}", basket.getId());
+                    return new RuntimeException("Basket is not found by id: " + basket.getId());
+                });
         oldBasket.setUser(basket.getUser());
         oldBasket.setService(basket.getService());
         return basketRepository.save(oldBasket);

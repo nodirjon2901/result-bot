@@ -1,6 +1,8 @@
 package uz.result.resultbot.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uz.result.resultbot.bot.UserSession;
 import uz.result.resultbot.model.CommercialOffer;
@@ -13,6 +15,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class CommercialOfferService {
+
+    private final Logger logger = LoggerFactory.getLogger(CommercialOfferService.class);
 
     private final CommercialOfferRepository commercialOfferRepository;
 
@@ -27,7 +31,10 @@ public class CommercialOfferService {
 
     public CommercialOffer update(CommercialOffer commercialOffer) {
         CommercialOffer oldCommercial = commercialOfferRepository.findById(commercialOffer.getId())
-                .orElseThrow(() -> new RuntimeException("Commercial is not found by id: " + commercialOffer.getId()));
+                .orElseThrow(() -> {
+                    logger.warn("Commercial is not found with ID: {}", commercialOffer.getId());
+                    return new RuntimeException("Commercial is not found by id: " + commercialOffer.getId());
+                });
         oldCommercial.setService(commercialOffer.getService());
         oldCommercial.setFullName(commercialOffer.getFullName());
         oldCommercial.setPhoneNumber(commercialOffer.getPhoneNumber());
@@ -44,19 +51,19 @@ public class CommercialOfferService {
     public void updatePhoneNum(String phoneNum, Long chatId) {
         CommercialOffer commercialOffer = UserSession.getCommercialOffer(chatId);
         commercialOffer.setPhoneNumber(phoneNum);
-        UserSession.updateCommercialOffer(chatId,commercialOffer);
+        UserSession.updateCommercialOffer(chatId, commercialOffer);
     }
 
     public void clearServices(Long chatId) {
         CommercialOffer commercialOffer = UserSession.getCommercialOffer(chatId);
         commercialOffer.setService(new HashSet<>());
-        UserSession.updateCommercialOffer(chatId,commercialOffer);
+        UserSession.updateCommercialOffer(chatId, commercialOffer);
     }
 
     public CommercialOffer setUserInCommercial(Long chatId, User user) {
         CommercialOffer commercialOffer = UserSession.getCommercialOffer(chatId);
         commercialOffer.setUser(user);
-        UserSession.updateCommercialOffer(chatId,commercialOffer);
+        UserSession.updateCommercialOffer(chatId, commercialOffer);
         return UserSession.getCommercialOffer(chatId);
     }
 }
