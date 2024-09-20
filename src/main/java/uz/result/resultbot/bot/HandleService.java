@@ -160,15 +160,15 @@ public class HandleService {
     public void siteServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
         SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
-        File imageFile = new File(PHOTO_PATH + "сайт.png");
+        File imageFile = new File(PHOTO_PATH + "Site.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
         if (userService.getLanguage(chatId).get().equals(Language.UZB))
             sendPhoto.setCaption("*Foydalanishda qulay va professional ko‘rinishga ega saytlarni ishlab chiqish, bu biznesingizni internetda ajralib turishiga yordam beradi.*");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Разработка сайтов, которые просты в использовании и выглядят профессионально, помогая бизнесу выделяться в интернете.*");
         sendPhoto.setParseMode("Markdown");
-        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         userService.updateUserState(chatId, UserState.SERVICE_SITE);
+        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
     }
 
@@ -177,15 +177,15 @@ public class HandleService {
     public void botServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
         SendPhoto sendPhoto=new SendPhoto();
         sendPhoto.setChatId(chatId);
-        File imageFile = new File(PHOTO_PATH + "телег бот.png");
+        File imageFile = new File(PHOTO_PATH + "Tg bot.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
         if (userService.getLanguage(chatId).get().equals(Language.UZB))
             sendPhoto.setCaption("*Mijozlar bilan muloqotni osonlashtiradigan va oddiy jarayonlarni avtomatlashtiradigan Telegram-botlar yaratish.*");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Создание Telegram-ботов, которые облегчают общение с клиентами и автоматизируют рутинные процессы.*");
         sendPhoto.setParseMode("Markdown");
-        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         userService.updateUserState(chatId, UserState.SERVICE_BOT);
+        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
     }
 
@@ -193,15 +193,15 @@ public class HandleService {
     public void smmServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
         SendPhoto sendPhoto=new SendPhoto();
         sendPhoto.setChatId(chatId);
-        File imageFile = new File(PHOTO_PATH +  "SMM.png");
+        File imageFile = new File(PHOTO_PATH +  "SMM.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
         if (userService.getLanguage(chatId).get().equals(Language.UZB))
             sendPhoto.setCaption("*Ijtimoiy tarmoqlarni yaratish va boshqarishda yordam berish, auditoriyani kengaytirish va brend imidjini yaxshilash.*");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Помощь в создании и управлении социальными сетями, чтобы увеличить аудиторию и улучшить имидж бренда.*");
         sendPhoto.setParseMode("Markdown");
-        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         userService.updateUserState(chatId, UserState.SERVICE_SMM);
+        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
     }
 
@@ -209,15 +209,15 @@ public class HandleService {
     public void advertisingServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
         SendPhoto sendPhoto=new SendPhoto();
         sendPhoto.setChatId(chatId);
-        File imageFile = new File(PHOTO_PATH + "Запуск реклам.png");
+        File imageFile = new File(PHOTO_PATH + "Add.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
         if (userService.getLanguage(chatId).get().equals(Language.UZB))
             sendPhoto.setCaption("*Kerakli mijozlarni jalb qiladigan va biznesingizga ko‘proq foyda keltiradigan reklamani sozlash.*");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Настройка рекламы, которая привлекает нужных клиентов и приносит бизнесу больше прибыли.*");
         sendPhoto.setParseMode("Markdown");
-        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         userService.updateUserState(chatId, UserState.SERVICE_ADVERTISING);
+        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
     }
 
@@ -225,15 +225,15 @@ public class HandleService {
     public void seoServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
         SendPhoto sendPhoto=new SendPhoto();
         sendPhoto.setChatId(chatId);
-        File imageFile = new File(PHOTO_PATH + "SEO.png");
+        File imageFile = new File(PHOTO_PATH + "SEO.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
         if (userService.getLanguage(chatId).get().equals(Language.UZB))
             sendPhoto.setCaption("*Saytingizni qidiruv tizimlarida yuqoriroq bo‘lishi va ko‘proq tashrif buyuruvchilarni jalb qilishi uchun optimallashtirish.*");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Оптимизация сайта, чтобы он был выше в поисковых системах и привлекал больше посетителей.*");
         sendPhoto.setParseMode("Markdown");
-        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         userService.updateUserState(chatId, UserState.SERVICE_SEO);
+        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
     }
 
@@ -241,15 +241,15 @@ public class HandleService {
     public void brandingServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
         SendPhoto sendPhoto=new SendPhoto();
         sendPhoto.setChatId(chatId);
-        File imageFile = new File(PHOTO_PATH + "Брендинг.png");
+        File imageFile = new File(PHOTO_PATH + "Branding.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
         if (userService.getLanguage(chatId).get().equals(Language.UZB))
             sendPhoto.setCaption("*Biznesingiz uchun o‘ziga xos uslub va obraz yaratish, bu esa mijozlar uchun oson tanib olinadigan va jozibali bo‘lishi uchun.*");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Создание уникального стиля и образа для бизнеса, который будет легко узнаваем и привлекателен для клиентов.*");
         sendPhoto.setParseMode("Markdown");
-        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         userService.updateUserState(chatId, UserState.SERVICE_BRANDING);
+        sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
     }
 

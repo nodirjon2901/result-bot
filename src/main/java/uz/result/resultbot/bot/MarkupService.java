@@ -8,11 +8,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import uz.result.resultbot.model.Basket;
 import uz.result.resultbot.model.Language;
+import uz.result.resultbot.model.UserState;
 import uz.result.resultbot.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import static uz.result.resultbot.model.UserState.*;
 
 @Service
 @RequiredArgsConstructor
@@ -50,18 +53,21 @@ public class MarkupService {
         String buttonText3 = "";
         String buttonText4 = "";
         String buttonText5 = "";
+        String buttonText6 = "";
         if (userService.getLanguage(chatId).get().equals(Language.UZB)) {
             buttonText1 = "Xizmatlar 📈";
             buttonText2 = "Ariza qoldirish ✍️";
             buttonText3 = "Bog'lanish 👨🏼‍💻";
             buttonText4 = "Savat 🛒";
-            buttonText5 = "Orqaga 🔙";
+            buttonText5 = "Bizning kanal \uD83D\uDC49";
+            buttonText6 = "Orqaga 🔙";
         } else if (userService.getLanguage(chatId).get().equals(Language.RUS)) {
             buttonText1 = "Услуги 📈";
             buttonText2 = "Оставить заявку ✍️";
             buttonText3 = "Связаться 👨🏼‍💻";
             buttonText4 = "Корзина 🛒";
-            buttonText5 = "Назад 🔙";
+            buttonText5 = "Наш канал \uD83D\uDC49";
+            buttonText6 = "Назад 🔙";
         }
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText(buttonText1);
@@ -89,6 +95,11 @@ public class MarkupService {
         buttonRow = new ArrayList<>();
         button = new InlineKeyboardButton();
         button.setText(buttonText5);
+        button.setUrl("t.me/result_med");
+        buttonRow.add(button);
+
+        button = new InlineKeyboardButton();
+        button.setText(buttonText6);
         button.setCallbackData("back");
         buttonRow.add(button);
         rowsInline.add(buttonRow);
@@ -174,23 +185,41 @@ public class MarkupService {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         List<InlineKeyboardButton> buttonRow = new ArrayList<>();
-
+        String URL="";
         String buttonText1 = "";
         String buttonText2 = "";
+        String buttonText3 = "";
+        String userState = userService.getUserState(chatId).name();
+        switch (userState) {
+            case "SERVICE_SITE" -> URL="https://result-me.uz/ru/services/web-development";
+            case "SERVICE_SEO" -> URL="https://result-me.uz/ru/services/seo";
+            case "SERVICE_SMM" -> URL="https://result-me.uz/ru/services/smm";
+            case "SERVICE_BOT" -> URL="https://result-me.uz/ru/services/telegram-bot-development";
+            case "SERVICE_BRANDING" -> URL="https://result-me.uz/ru/services/branding";
+            case "SERVICE_ADVERTISING" -> URL="https://result-me.uz/ru/services/ads-launch";
+        }
+
         if (userService.getLanguage(chatId).get().equals(Language.UZB)) {
-            buttonText1 = "Savatga 🛒";
-            buttonText2 = "Orqaga 🔙";
+            buttonText1 = "Ba'tafsil \uD83D\uDC49";
+            buttonText2 = "Savatga 🛒";
+            buttonText3 = "Orqaga 🔙";
         } else if (userService.getLanguage(chatId).get().equals(Language.RUS)) {
-            buttonText1 = "В корзину 🛒";
-            buttonText2 = "Назад 🔙";
+            buttonText1 = "Подробнее \uD83D\uDC49";
+            buttonText2 = "В корзину 🛒";
+            buttonText3 = "Назад 🔙";
         }
         InlineKeyboardButton button = new InlineKeyboardButton();
         button.setText(buttonText1);
-        button.setCallbackData("basket");
+        button.setUrl(URL);
         buttonRow.add(button);
 
         button = new InlineKeyboardButton();
         button.setText(buttonText2);
+        button.setCallbackData("basket");
+        buttonRow.add(button);
+
+        button = new InlineKeyboardButton();
+        button.setText(buttonText3);
         button.setCallbackData("back");
         buttonRow.add(button);
 
@@ -285,10 +314,10 @@ public class MarkupService {
         String buttonText1 = "";
         String buttonText2 = "";
         if (userService.getLanguage(chatId).get().equals(Language.UZB)) {
-            buttonText1 = "Jo'natish ✅";
+            buttonText1 = "OK ✅";
             buttonText2 = "Orqaga \uD83D\uDD19";
         } else if (userService.getLanguage(chatId).get().equals(Language.RUS)) {
-            buttonText1 = "Перевозки ✅";
+            buttonText1 = "ОК ✅";
             buttonText2 = "Назад \uD83D\uDD19";
         }
         InlineKeyboardButton button = new InlineKeyboardButton();
@@ -429,10 +458,10 @@ public class MarkupService {
         String buttonText1 = "";
         String buttonText2 = "";
         if (userService.getLanguage(chatId).get().equals(Language.UZB)) {
-            buttonText1 = "Jo'natish ✅";
+            buttonText1 = "OK ✅";
             buttonText2 = "Yana ➕";
         } else if (userService.getLanguage(chatId).get().equals(Language.RUS)) {
-            buttonText1 = "Перевозки ✅";
+            buttonText1 = "ОК ✅";
             buttonText2 = "Снова ➕";
         }
         InlineKeyboardButton button = new InlineKeyboardButton();
