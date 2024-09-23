@@ -111,10 +111,12 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Пожалуйста, выберите одну из функций ниже");
         sendMessage.setReplyMarkup(markupService.functionInlineMarkup(chatId));
+        if (!userService.getUserState(chatId).equals(UserState.COMMERCIAL_SEND_USER)) {
+            removeMessage(chatId, bot);
+        }
         userService.updateUserState(chatId, UserState.SELECT_FUNCTION);
         Message message = bot.execute(sendMessage);
-        removeMessage(chatId, bot);
-        removeUserWriteMessage(chatId,bot);
+        removeUserWriteMessage(chatId, bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
@@ -421,6 +423,7 @@ public class HandleService {
         UserSession.removeUserMessageId(chatId);
         menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
         UserSession.removeApplication(chatId);
+        UserSession.clearMessageChatId(chatId);
     }
 
     private void sendApplicationToCompanyGroup(TelegramLongPollingBot bot, Application application) throws TelegramApiException {
@@ -708,6 +711,7 @@ public class HandleService {
         sendMessage.setParseMode("Markdown");
         userService.updateUserState(chatId, UserState.COMMERCIAL_SELECTED_SERVICE);
         bot.execute(sendMessage);
+        removeMessage(chatId,bot);
     }
 
     @SneakyThrows
@@ -734,8 +738,9 @@ public class HandleService {
         sendMessage.setParseMode("Markdown");
         sendMessage.setReplyMarkup(markupService.sendToUserAppButtonsInlineMarkup(chatId));
         userService.updateUserState(chatId, UserState.COMMERCIAL_SEND_USER);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
         removeMessage(chatId, bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -769,6 +774,7 @@ public class HandleService {
         menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
         UserSession.removeCommercialOffer(chatId);
         basketService.deleteByChatId(chatId);//Agar user tijorat taklifini yuborib bo'lgach savat avtofat tozalanib ketishi kerak bo'lsa
+        UserSession.clearMessageChatId(chatId);
     }
 
 //    @SneakyThrows

@@ -24,6 +24,13 @@ public class UserSession {
 
     private static final ConcurrentHashMap<Long, List<Integer>> userAppMessageIds = new ConcurrentHashMap<>();
 
+    public static void clearMessageChatId(Long chatId){
+        removeUserMessageId(chatId);
+        removeAppMessageIdList(chatId);
+        removeSpecialMessageIdList(chatId);
+        removeUserWriteMessageId(chatId);
+    }
+
     public static void updateUserWriteMessageId(Long chatId, Integer messageId) {
         userWriteMessageChatId.put(chatId, messageId);
     }
@@ -64,15 +71,15 @@ public class UserSession {
         userSpecialMessageIds.remove(chatId);
     }
 
-    public static void removeSpecialOneMessageId(Long chatId, Integer messageId) {
-        List<Integer> list = getSpecialMessageId(chatId);
-        if (list != null && !list.isEmpty()) {
-            boolean remove = list.remove(messageId);
-            if (!remove) {
-                System.out.println("MessageId is not found with id: " + messageId);
-            }
-        }
-    }
+//    public static void removeSpecialOneMessageId(Long chatId, Integer messageId) {
+//        List<Integer> list = getSpecialMessageId(chatId);
+//        if (list != null && !list.isEmpty()) {
+//            boolean remove = list.remove(messageId);
+//            if (!remove) {
+//                System.out.println("MessageId is not found with id: " + messageId);
+//            }
+//        }
+//    }
 
     public static void updateUserMessageId(Long chatId, Integer messageId) {
         userMessageChatId.put(chatId, messageId);
