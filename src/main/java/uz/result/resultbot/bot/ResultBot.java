@@ -49,7 +49,7 @@ public class ResultBot extends TelegramLongPollingBot {
         if (update.hasMessage()) {
             Long chatId = update.getMessage().getChatId();
             Integer messageId = update.getMessage().getMessageId();
-            UserState currentState = userService.getUserState(chatId);
+            UserState currentState = UserSession.getUserStateTemporary(chatId);
 
             if (currentState.equals(UserState.COMMERCIAL_FULL_NAME) || currentState.equals(UserState.COMMERCIAL_PHONE_NUMBER)) {
                 UserSession.updateSpecialMessageId(chatId, messageId);
@@ -57,8 +57,8 @@ public class ResultBot extends TelegramLongPollingBot {
             if (currentState.equals(UserState.APP_FULL_NAME) || currentState.equals(UserState.APP_PHONE_NUMBER)) {
                 UserSession.updateAppMessageId(chatId, messageId);
             }
-            if (!(currentState.equals(UserState.COMMERCIAL_FULL_NAME) || currentState.equals(UserState.COMMERCIAL_PHONE_NUMBER)||
-                    currentState.equals(UserState.APP_FULL_NAME) || currentState.equals(UserState.APP_PHONE_NUMBER))){
+            if (!(currentState.equals(UserState.COMMERCIAL_FULL_NAME) || currentState.equals(UserState.COMMERCIAL_PHONE_NUMBER) ||
+                    currentState.equals(UserState.APP_FULL_NAME) || currentState.equals(UserState.APP_PHONE_NUMBER))) {
                 UserSession.updateUserWriteMessageId(chatId, update.getMessage().getMessageId());
             }
 
@@ -66,7 +66,8 @@ public class ResultBot extends TelegramLongPollingBot {
                 String text = update.getMessage().getText();
                 if (userService.existsByChatId(chatId)) {
                     if (text.equals("/start")) {
-                        currentState = userService.updateUserState(chatId, UserState.START);
+                        userService.updateUserState(chatId, UserState.START);
+                        currentState = UserSession.updateUserState(chatId, UserState.START);
                         UserSession.removeApplication(chatId);
                     }
                 }
@@ -105,7 +106,7 @@ public class ResultBot extends TelegramLongPollingBot {
         if (update.hasCallbackQuery()) {
             Long chatId = update.getCallbackQuery().getMessage().getChatId();
             String data = update.getCallbackQuery().getData();
-            UserState currentState = userService.getUserState(chatId);
+            UserState currentState = UserSession.getUserStateTemporary(chatId);
 
             switch (currentState) {
                 case START -> {

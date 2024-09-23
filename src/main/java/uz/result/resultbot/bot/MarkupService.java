@@ -8,14 +8,12 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import uz.result.resultbot.model.Basket;
 import uz.result.resultbot.model.Language;
-import uz.result.resultbot.model.UserState;
 import uz.result.resultbot.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static uz.result.resultbot.model.UserState.*;
 
 @Service
 @RequiredArgsConstructor
@@ -189,7 +187,7 @@ public class MarkupService {
         String buttonText1 = "";
         String buttonText2 = "";
         String buttonText3 = "";
-        String userState = userService.getUserState(chatId).name();
+        String userState = UserSession.getUserStateTemporary(chatId).name();
         switch (userState) {
             case "SERVICE_SITE" -> URL="https://result-me.uz/ru/services/web-development";
             case "SERVICE_SEO" -> URL="https://result-me.uz/ru/services/seo";

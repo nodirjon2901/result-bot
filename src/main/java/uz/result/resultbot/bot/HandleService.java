@@ -57,6 +57,7 @@ public class HandleService {
                     .userState(UserState.START)
                     .build();
             userService.save(user);
+            UserSession.updateUserState(chatId, UserState.START);
             startMessageHandler(chatId, bot);
             return;
         }
@@ -111,10 +112,10 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Пожалуйста, выберите одну из функций ниже");
         sendMessage.setReplyMarkup(markupService.functionInlineMarkup(chatId));
-        if (!userService.getUserState(chatId).equals(UserState.COMMERCIAL_SEND_USER)) {
+        if (!UserSession.getUserStateTemporary(chatId).equals(UserState.COMMERCIAL_SEND_USER)) {
             removeMessage(chatId, bot);
         }
-        userService.updateUserState(chatId, UserState.SELECT_FUNCTION);
+        UserSession.updateUserState(chatId, UserState.SELECT_FUNCTION);
         Message message = bot.execute(sendMessage);
         removeUserWriteMessage(chatId, bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
@@ -123,37 +124,37 @@ public class HandleService {
 
     @SneakyThrows
     public void backOperationMessageHandler(Long chatId, TelegramLongPollingBot bot) {
-        UserState userState = userService.getUserState(chatId);
+        UserState userState = UserSession.getUserStateTemporary(chatId);
         if (userState.equals(UserState.SELECT_FUNCTION)) {
-            userService.updateUserState(chatId, UserState.START);
+            UserSession.updateUserState(chatId, UserState.START);
             startMessageHandler(chatId, bot);
         } else if (userState.equals(UserState.FUNCTION_SERVICE)) {
-            userService.updateUserState(chatId, UserState.SELECT_FUNCTION);
+            UserSession.updateUserState(chatId, UserState.SELECT_FUNCTION);
             String data = userService.getLanguage(chatId).get().name();
             menuMessageHandler(chatId, data, bot);
         } else if (userState.equals(UserState.SERVICE_ADVERTISING) || userState.equals(UserState.SERVICE_BOT) || userState.equals(UserState.SERVICE_BRANDING) ||
                 userState.equals(UserState.SERVICE_SEO) || userState.equals(UserState.SERVICE_SMM) || userState.equals(UserState.SERVICE_SITE)) {
-            userService.updateUserState(chatId, UserState.FUNCTION_SERVICE);
+            UserSession.updateUserState(chatId, UserState.FUNCTION_SERVICE);
             serviceSelectFunctionMessageHandler(chatId, bot);
         } else if (userState.equals(UserState.APP_SELECTED_SERVICE)) {
-            userService.updateUserState(chatId, UserState.APP_SERVICE);
+            UserSession.updateUserState(chatId, UserState.APP_SERVICE);
             applicationService.clearServices(chatId);
             String phoneNumber = UserSession.getApplication(chatId).getPhoneNumber();
             appPhoneNumMessageHandler(chatId, phoneNumber, bot);
         } else if (userState.equals(UserState.APP_SEND_USER)) {
-            userService.updateUserState(chatId, UserState.APP_SELECTED_SERVICE);
+            UserSession.updateUserState(chatId, UserState.APP_SELECTED_SERVICE);
             selectAppServiceMessageHandler(chatId, bot);
         } else if (userState.equals(UserState.FUNCTION_BASKET)) {
-            userService.updateUserState(chatId, UserState.SELECT_FUNCTION);
+            UserSession.updateUserState(chatId, UserState.SELECT_FUNCTION);
             menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
         } else if (userState.equals(UserState.FUNCTION_BASKET_SELECTED_SERVICE)) {
-            userService.updateUserState(chatId, UserState.FUNCTION_BASKET);
+            UserSession.updateUserState(chatId, UserState.FUNCTION_BASKET);
             basketMessageHandler(chatId, bot);
         } else if (userState.equals(UserState.COMMERCIAL_SELECTED_SERVICE)) {
-            userService.updateUserState(chatId, UserState.COMMERCIAL_SERVICE);
+            UserSession.updateUserState(chatId, UserState.COMMERCIAL_SERVICE);
             commercialCurrentServiceMessageHandler(chatId, bot);
         } else if (userState.equals(UserState.COMMERCIAL_SEND_USER)) {
-            userService.updateUserState(chatId, UserState.COMMERCIAL_SELECTED_SERVICE);
+            UserSession.updateUserState(chatId, UserState.COMMERCIAL_SELECTED_SERVICE);
             selectBasketServiceMessageHandler(chatId, bot);
         }
     }
@@ -167,7 +168,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Наши услуги");
         sendMessage.setReplyMarkup(markupService.serviceInlineMarkup(chatId));
-        userService.updateUserState(chatId, UserState.FUNCTION_SERVICE);
+        UserSession.updateUserState(chatId, UserState.FUNCTION_SERVICE);
         Message message = bot.execute(sendMessage);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
@@ -183,7 +184,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Разработка сайтов, которые просты в использовании и выглядят профессионально, помогая бизнесу выделяться в интернете.*");
         sendPhoto.setParseMode("Markdown");
-        userService.updateUserState(chatId, UserState.SERVICE_SITE);
+        UserSession.updateUserState(chatId, UserState.SERVICE_SITE);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
         removeMessage(chatId, bot);
@@ -201,7 +202,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Создание Telegram-ботов, которые облегчают общение с клиентами и автоматизируют рутинные процессы.*");
         sendPhoto.setParseMode("Markdown");
-        userService.updateUserState(chatId, UserState.SERVICE_BOT);
+        UserSession.updateUserState(chatId, UserState.SERVICE_BOT);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
         removeMessage(chatId, bot);
@@ -218,7 +219,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Помощь в создании и управлении социальными сетями, чтобы увеличить аудиторию и улучшить имидж бренда.*");
         sendPhoto.setParseMode("Markdown");
-        userService.updateUserState(chatId, UserState.SERVICE_SMM);
+        UserSession.updateUserState(chatId, UserState.SERVICE_SMM);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
         removeMessage(chatId, bot);
@@ -235,7 +236,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Настройка рекламы, которая привлекает нужных клиентов и приносит бизнесу больше прибыли.*");
         sendPhoto.setParseMode("Markdown");
-        userService.updateUserState(chatId, UserState.SERVICE_ADVERTISING);
+        UserSession.updateUserState(chatId, UserState.SERVICE_ADVERTISING);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
         removeMessage(chatId, bot);
@@ -252,7 +253,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Оптимизация сайта, чтобы он был выше в поисковых системах и привлекал больше посетителей.*");
         sendPhoto.setParseMode("Markdown");
-        userService.updateUserState(chatId, UserState.SERVICE_SEO);
+        UserSession.updateUserState(chatId, UserState.SERVICE_SEO);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
         removeMessage(chatId, bot);
@@ -269,7 +270,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendPhoto.setCaption("*Создание уникального стиля и образа для бизнеса, который будет легко узнаваем и привлекателен для клиентов.*");
         sendPhoto.setParseMode("Markdown");
-        userService.updateUserState(chatId, UserState.SERVICE_BRANDING);
+        UserSession.updateUserState(chatId, UserState.SERVICE_BRANDING);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
         removeMessage(chatId, bot);
@@ -283,7 +284,7 @@ public class HandleService {
             sendMessage.setText("Ism sharifingiz kiriting (F.I.O): ");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Введите свое полное имя (Ф.И.O): ");
-        userService.updateUserState(chatId, UserState.APP_FULL_NAME);
+        UserSession.updateUserState(chatId, UserState.APP_FULL_NAME);
         Message message = bot.execute(sendMessage);
         removeMessage(chatId, bot);
         UserSession.updateAppMessageId(chatId, message.getMessageId());
@@ -298,7 +299,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Введите номер телефона: ");
         applicationService.updateFullName(fullName, chatId);
-        userService.updateUserState(chatId, UserState.APP_PHONE_NUMBER);
+        UserSession.updateUserState(chatId, UserState.APP_PHONE_NUMBER);
         Message message = bot.execute(sendMessage);
         UserSession.updateAppMessageId(chatId, message.getMessageId());
     }
@@ -313,7 +314,7 @@ public class HandleService {
             sendMessage.setText("Выберите интересующие вас услуги: ");
         sendMessage.setReplyMarkup(markupService.interestedServiceInlineMarkup(chatId));
         applicationService.updatePhoneNum(phoneNum, chatId);
-        userService.updateUserState(chatId, UserState.APP_SERVICE);
+        UserSession.updateUserState(chatId, UserState.APP_SERVICE);
         Message message = bot.execute(sendMessage);
         removeAppSpecialMessage(chatId, bot);
         removeMessage(chatId, bot);
@@ -335,7 +336,7 @@ public class HandleService {
             sendMessage.setText("*Услуги, которые вы выбираете:*\n\n" + "_" + formattedSelectAppServices(application.getService()) + "_\n");
         sendMessage.setReplyMarkup(markupService.appSelectedServiceButtonInlineMarkup(chatId));
         sendMessage.setParseMode("Markdown");
-        userService.updateUserState(chatId, UserState.APP_SELECTED_SERVICE);
+        UserSession.updateUserState(chatId, UserState.APP_SELECTED_SERVICE);
         Message message = bot.execute(sendMessage);
         removeMessage(chatId, bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
@@ -350,7 +351,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Выберите интересующие вас услуги: ");
         sendMessage.setReplyMarkup(markupService.interestedServiceInlineMarkup(chatId));
-        userService.updateUserState(chatId, UserState.APP_SERVICE);
+        UserSession.updateUserState(chatId, UserState.APP_SERVICE);
         Message message = bot.execute(sendMessage);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
@@ -386,7 +387,7 @@ public class HandleService {
             sendMessage.setText("*Ваше приложение:* \n\n" + formattedApplication(chatId, application) + "\n");
         sendMessage.setParseMode("Markdown");
         sendMessage.setReplyMarkup(markupService.sendToUserAppButtonsInlineMarkup(chatId));
-        userService.updateUserState(chatId, UserState.APP_SEND_USER);
+        UserSession.updateUserState(chatId, UserState.APP_SEND_USER);
         Message message = bot.execute(sendMessage);
         removeMessage(chatId, bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
@@ -421,6 +422,7 @@ public class HandleService {
         sendMessage.setParseMode("Markdown");
         bot.execute(sendMessage);
         UserSession.removeUserMessageId(chatId);
+        UserSession.removeUserState(chatId);
         menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
         UserSession.removeApplication(chatId);
         UserSession.clearMessageChatId(chatId);
@@ -462,7 +464,7 @@ public class HandleService {
 
     //
 
-    public String createNotionJson(Application application) {
+    private String createNotionJson(Application application) {
         return "{"
                 + "\"parent\": { \"database_id\": \"" + "2b43ccc3b4af4e53a8e6802fb3f7fcfb" + "\" },"
                 + "\"properties\": {"
@@ -480,7 +482,7 @@ public class HandleService {
     }
 
 
-    public static String escapeJson(String value) {
+    private static String escapeJson(String value) {
         if (value == null) {
             return null;
         }
@@ -499,7 +501,7 @@ public class HandleService {
 
     @SneakyThrows
     public void basketOperationMessageHandler(Long chatId, TelegramLongPollingBot bot) {
-        UserState userState = userService.getUserState(chatId);
+        UserState userState = UserSession.getUserStateTemporary(chatId);
         Basket basket = basketService.findByChatId(chatId);
         if (basket == null)
             basket = UserSession.getBasket(chatId);
@@ -545,7 +547,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Выберите одну из функций ниже: ");
         sendMessage.setReplyMarkup(markupService.basketFunctionInlineMarkup(chatId));
-        userService.updateUserState(chatId, UserState.FUNCTION_BASKET);
+        UserSession.updateUserState(chatId, UserState.FUNCTION_BASKET);
         Message message = bot.execute(sendMessage);
         Thread.sleep(3000);
         removeMessage(chatId, bot);
@@ -574,7 +576,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Услуги, которые вы выбираете: ");
         sendMessage.setReplyMarkup(markupService.selectServiceListInBasketFunctionInlineMarkup(chatId, basket));
-        userService.updateUserState(chatId, UserState.FUNCTION_BASKET_SELECTED_SERVICE);
+        UserSession.updateUserState(chatId, UserState.FUNCTION_BASKET_SELECTED_SERVICE);
         removeMessage(chatId, bot);
         Message message = bot.execute(sendMessage);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
@@ -604,7 +606,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("*Корзина очищена*‼️");
         sendMessage.setParseMode("Markdown");
-        userService.updateUserState(chatId, UserState.FUNCTION_BASKET);
+        UserSession.updateUserState(chatId, UserState.FUNCTION_BASKET);
         removeMessage(chatId, bot);
         Message message = bot.execute(sendMessage);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
@@ -619,7 +621,7 @@ public class HandleService {
             sendMessage.setText("Ism sharifingiz kiriting (F.I.O): ");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Введите свое полное имя (Ф.И.O): ");
-        userService.updateUserState(chatId, UserState.COMMERCIAL_FULL_NAME);
+        UserSession.updateUserState(chatId, UserState.COMMERCIAL_FULL_NAME);
         Message message = bot.execute(sendMessage);
         UserSession.updateSpecialMessageId(chatId, message.getMessageId());
     }
@@ -633,7 +635,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Введите номер телефона: ");
         commercialService.updateFullName(fullName, chatId);
-        userService.updateUserState(chatId, UserState.COMMERCIAL_PHONE_NUMBER);
+        UserSession.updateUserState(chatId, UserState.COMMERCIAL_PHONE_NUMBER);
         Message message = bot.execute(sendMessage);
         UserSession.updateSpecialMessageId(chatId, message.getMessageId());
     }
@@ -661,7 +663,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Выберите интересующие вас услуги: ");
         sendMessage.setReplyMarkup(markupService.interestedServiceInlineMarkup(chatId));
-        userService.updateUserState(chatId, UserState.COMMERCIAL_SERVICE);
+        UserSession.updateUserState(chatId, UserState.COMMERCIAL_SERVICE);
         Message message = bot.execute(sendMessage);
         removeMessage(chatId, bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
@@ -677,7 +679,7 @@ public class HandleService {
             sendMessage.setText("*Услуги, которые вы выбираете:* " + formatBasketService(basket.getService()));
         sendMessage.setParseMode("Markdown");
         sendMessage.setReplyMarkup(markupService.commercialOfferButtonsInlineKeyboardMarkup(chatId));
-        userService.updateUserState(chatId, UserState.COMMERCIAL_OLD_SERVICE);
+        UserSession.updateUserState(chatId, UserState.COMMERCIAL_OLD_SERVICE);
         Message message = bot.execute(sendMessage);
         removeSpecialMessage(chatId, bot);
         removeMessage(chatId, bot);
@@ -709,9 +711,9 @@ public class HandleService {
             sendMessage.setText("*Услуги, которые вы выбираете:*\n\n" + "_" + formatBasketService(basket.getService()) + "_\n");
         sendMessage.setReplyMarkup(markupService.appSelectedServiceButtonInlineMarkup(chatId));
         sendMessage.setParseMode("Markdown");
-        userService.updateUserState(chatId, UserState.COMMERCIAL_SELECTED_SERVICE);
+        UserSession.updateUserState(chatId, UserState.COMMERCIAL_SELECTED_SERVICE);
         bot.execute(sendMessage);
-        removeMessage(chatId,bot);
+        removeMessage(chatId, bot);
     }
 
     @SneakyThrows
@@ -737,7 +739,7 @@ public class HandleService {
             sendMessage.setText("*Коммерческое предложение:* \n\n" + formattedCommercial(chatId, commercialOffer) + "\n");
         sendMessage.setParseMode("Markdown");
         sendMessage.setReplyMarkup(markupService.sendToUserAppButtonsInlineMarkup(chatId));
-        userService.updateUserState(chatId, UserState.COMMERCIAL_SEND_USER);
+        UserSession.updateUserState(chatId, UserState.COMMERCIAL_SEND_USER);
         Message message = bot.execute(sendMessage);
         removeMessage(chatId, bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
@@ -771,27 +773,15 @@ public class HandleService {
             sendMessage.setText("*Коммерческое предложение принято* ✅");
         sendMessage.setParseMode("Markdown");
         bot.execute(sendMessage);
+        UserSession.removeUserState(chatId);
         menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
         UserSession.removeCommercialOffer(chatId);
         basketService.deleteByChatId(chatId);//Agar user tijorat taklifini yuborib bo'lgach savat avtofat tozalanib ketishi kerak bo'lsa
         UserSession.clearMessageChatId(chatId);
     }
 
-//    @SneakyThrows
-//    public void removeMessage(Long chatId, TelegramLongPollingBot bot) {
-//        Integer messageId = UserSession.getUserMessageId(chatId);
-//        if (messageId != null) {
-//            DeleteMessage deleteMessage = new DeleteMessage();
-//            deleteMessage.setChatId(chatId);
-//            deleteMessage.setMessageId(messageId);
-//            bot.execute(deleteMessage);
-//            UserSession.removeUserMessageId(chatId);
-//        }
-//    }
-
-
     @SneakyThrows
-    public void removeMessage(Long chatId, TelegramLongPollingBot bot) {
+    private void removeMessage(Long chatId, TelegramLongPollingBot bot) {
         Integer messageId = UserSession.getUserMessageId(chatId);
         if (messageId != null) {
             try {
@@ -802,7 +792,6 @@ public class HandleService {
                 UserSession.removeUserMessageId(chatId);
             } catch (TelegramApiRequestException e) {
                 if (e.getErrorCode() == 400 && e.getApiResponse().contains("message to delete not found")) {
-                    System.out.println("Xabar allaqachon o'chirilgan yoki topilmadi: " + messageId);
                     UserSession.removeUserMessageId(chatId);
                 } else {
                     throw e;
@@ -812,7 +801,7 @@ public class HandleService {
     }
 
     @SneakyThrows
-    public void removeUserWriteMessage(Long chatId, TelegramLongPollingBot bot) {
+    private void removeUserWriteMessage(Long chatId, TelegramLongPollingBot bot) {
         Integer messageId = UserSession.getUserWriteMessageId(chatId);
         if (messageId != null) {
             try {
@@ -823,7 +812,6 @@ public class HandleService {
                 UserSession.removeUserMessageId(chatId);
             } catch (TelegramApiRequestException e) {
                 if (e.getErrorCode() == 400 && e.getApiResponse().contains("message to delete not found")) {
-                    System.out.println("Xabar allaqachon o'chirilgan yoki topilmadi: " + messageId);
                     UserSession.removeUserMessageId(chatId);
                 } else {
                     throw e;
@@ -848,7 +836,7 @@ public class HandleService {
     }
 
     @SneakyThrows
-    public void removeAppSpecialMessage(Long chatId, TelegramLongPollingBot bot) {
+    private void removeAppSpecialMessage(Long chatId, TelegramLongPollingBot bot) {
         List<Integer> appMessageIds = UserSession.getAppMessageIds(chatId);
         if (appMessageIds == null || appMessageIds.isEmpty())
             return;
@@ -890,7 +878,7 @@ public class HandleService {
         }
     }
 
-    public String createNotionJsonCommercialOffer(CommercialOffer offer) {
+    private String createNotionJsonCommercialOffer(CommercialOffer offer) {
         return "{"
                 + "\"parent\": { \"database_id\": \"" + "cf24a83b587a464389a730fbdf0679f8" + "\" },"
                 + "\"properties\": {"

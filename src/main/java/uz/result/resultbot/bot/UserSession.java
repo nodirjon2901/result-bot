@@ -3,6 +3,7 @@ package uz.result.resultbot.bot;
 import uz.result.resultbot.model.Application;
 import uz.result.resultbot.model.Basket;
 import uz.result.resultbot.model.CommercialOffer;
+import uz.result.resultbot.model.UserState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +19,28 @@ public class UserSession {
 
     private static final ConcurrentHashMap<Long, Integer> userMessageChatId = new ConcurrentHashMap<>();
 
-    private static final ConcurrentHashMap<Long, Integer> userWriteMessageChatId=new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, Integer> userWriteMessageChatId = new ConcurrentHashMap<>();
 
     private static final ConcurrentHashMap<Long, List<Integer>> userSpecialMessageIds = new ConcurrentHashMap<>();
 
     private static final ConcurrentHashMap<Long, List<Integer>> userAppMessageIds = new ConcurrentHashMap<>();
 
-    public static void clearMessageChatId(Long chatId){
+    private static final ConcurrentHashMap<Long, UserState> userStates = new ConcurrentHashMap<>();
+
+    public static UserState updateUserState(Long chatId, UserState userState) {
+         userStates.put(chatId, userState);
+         return userState;
+    }
+
+    public static UserState getUserStateTemporary(Long chatId) {
+        return userStates.getOrDefault(chatId, UserState.DEFAULT);
+    }
+
+    public static void removeUserState(Long chatId) {
+        userStates.remove(chatId);
+    }
+
+    public static void clearMessageChatId(Long chatId) {
         removeUserMessageId(chatId);
         removeAppMessageIdList(chatId);
         removeSpecialMessageIdList(chatId);
@@ -70,16 +86,6 @@ public class UserSession {
     public static void removeSpecialMessageIdList(Long chatId) {
         userSpecialMessageIds.remove(chatId);
     }
-
-//    public static void removeSpecialOneMessageId(Long chatId, Integer messageId) {
-//        List<Integer> list = getSpecialMessageId(chatId);
-//        if (list != null && !list.isEmpty()) {
-//            boolean remove = list.remove(messageId);
-//            if (!remove) {
-//                System.out.println("MessageId is not found with id: " + messageId);
-//            }
-//        }
-//    }
 
     public static void updateUserMessageId(Long chatId, Integer messageId) {
         userMessageChatId.put(chatId, messageId);
