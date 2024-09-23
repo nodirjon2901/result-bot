@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import uz.result.resultbot.model.*;
 import uz.result.resultbot.service.ApplicationService;
 import uz.result.resultbot.service.BasketService;
@@ -22,6 +25,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -63,7 +67,10 @@ public class HandleService {
                         \s
                         Нажмите /start, чтобы начать
                         """);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        removeMessage(chatId, bot);
+        removeUserWriteMessage(chatId, bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -76,7 +83,10 @@ public class HandleService {
                         Привет. Выберите язык"""
         );
         sendMessage.setReplyMarkup(markupService.selectLanguageInlineMarkup());
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        removeMessage(chatId, bot);
+        removeUserWriteMessage(chatId, bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
 
@@ -102,7 +112,10 @@ public class HandleService {
             sendMessage.setText("Пожалуйста, выберите одну из функций ниже");
         sendMessage.setReplyMarkup(markupService.functionInlineMarkup(chatId));
         userService.updateUserState(chatId, UserState.SELECT_FUNCTION);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        removeMessage(chatId, bot);
+        removeUserWriteMessage(chatId,bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
 
@@ -153,7 +166,8 @@ public class HandleService {
             sendMessage.setText("Наши услуги");
         sendMessage.setReplyMarkup(markupService.serviceInlineMarkup(chatId));
         userService.updateUserState(chatId, UserState.FUNCTION_SERVICE);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -170,12 +184,13 @@ public class HandleService {
         userService.updateUserState(chatId, UserState.SERVICE_SITE);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
+        removeMessage(chatId, bot);
     }
 
 
     @SneakyThrows
     public void botServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
-        SendPhoto sendPhoto=new SendPhoto();
+        SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         File imageFile = new File(PHOTO_PATH + "Tg bot.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
@@ -187,13 +202,14 @@ public class HandleService {
         userService.updateUserState(chatId, UserState.SERVICE_BOT);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
+        removeMessage(chatId, bot);
     }
 
     @SneakyThrows
     public void smmServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
-        SendPhoto sendPhoto=new SendPhoto();
+        SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
-        File imageFile = new File(PHOTO_PATH +  "SMM.jpg");
+        File imageFile = new File(PHOTO_PATH + "SMM.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
         if (userService.getLanguage(chatId).get().equals(Language.UZB))
             sendPhoto.setCaption("*Ijtimoiy tarmoqlarni yaratish va boshqarishda yordam berish, auditoriyani kengaytirish va brend imidjini yaxshilash.*");
@@ -203,11 +219,12 @@ public class HandleService {
         userService.updateUserState(chatId, UserState.SERVICE_SMM);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
+        removeMessage(chatId, bot);
     }
 
     @SneakyThrows
     public void advertisingServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
-        SendPhoto sendPhoto=new SendPhoto();
+        SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         File imageFile = new File(PHOTO_PATH + "Add.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
@@ -219,11 +236,12 @@ public class HandleService {
         userService.updateUserState(chatId, UserState.SERVICE_ADVERTISING);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
+        removeMessage(chatId, bot);
     }
 
     @SneakyThrows
     public void seoServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
-        SendPhoto sendPhoto=new SendPhoto();
+        SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         File imageFile = new File(PHOTO_PATH + "SEO.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
@@ -235,11 +253,12 @@ public class HandleService {
         userService.updateUserState(chatId, UserState.SERVICE_SEO);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
+        removeMessage(chatId, bot);
     }
 
     @SneakyThrows
     public void brandingServiceMessageHandler(Long chatId, TelegramLongPollingBot bot) {
-        SendPhoto sendPhoto=new SendPhoto();
+        SendPhoto sendPhoto = new SendPhoto();
         sendPhoto.setChatId(chatId);
         File imageFile = new File(PHOTO_PATH + "Branding.jpg");
         sendPhoto.setPhoto(new InputFile(imageFile));
@@ -251,6 +270,7 @@ public class HandleService {
         userService.updateUserState(chatId, UserState.SERVICE_BRANDING);
         sendPhoto.setReplyMarkup(markupService.serviceButtonInlineKeyboardMarkup(chatId));
         bot.execute(sendPhoto);
+        removeMessage(chatId, bot);
     }
 
     @SneakyThrows
@@ -262,7 +282,9 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Введите свое полное имя (Ф.И.O): ");
         userService.updateUserState(chatId, UserState.APP_FULL_NAME);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        removeMessage(chatId, bot);
+        UserSession.updateAppMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -275,7 +297,8 @@ public class HandleService {
             sendMessage.setText("Введите номер телефона: ");
         applicationService.updateFullName(fullName, chatId);
         userService.updateUserState(chatId, UserState.APP_PHONE_NUMBER);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        UserSession.updateAppMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -289,7 +312,10 @@ public class HandleService {
         sendMessage.setReplyMarkup(markupService.interestedServiceInlineMarkup(chatId));
         applicationService.updatePhoneNum(phoneNum, chatId);
         userService.updateUserState(chatId, UserState.APP_SERVICE);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        removeAppSpecialMessage(chatId, bot);
+        removeMessage(chatId, bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -308,7 +334,9 @@ public class HandleService {
         sendMessage.setReplyMarkup(markupService.appSelectedServiceButtonInlineMarkup(chatId));
         sendMessage.setParseMode("Markdown");
         userService.updateUserState(chatId, UserState.APP_SELECTED_SERVICE);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        removeMessage(chatId, bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -321,7 +349,8 @@ public class HandleService {
             sendMessage.setText("Выберите интересующие вас услуги: ");
         sendMessage.setReplyMarkup(markupService.interestedServiceInlineMarkup(chatId));
         userService.updateUserState(chatId, UserState.APP_SERVICE);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     private String formattedSelectAppServices(Set<String> services) {
@@ -356,7 +385,9 @@ public class HandleService {
         sendMessage.setParseMode("Markdown");
         sendMessage.setReplyMarkup(markupService.sendToUserAppButtonsInlineMarkup(chatId));
         userService.updateUserState(chatId, UserState.APP_SEND_USER);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        removeMessage(chatId, bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -387,6 +418,7 @@ public class HandleService {
             sendMessage.setText("*Ваша заявка принята* ✅");
         sendMessage.setParseMode("Markdown");
         bot.execute(sendMessage);
+        UserSession.removeUserMessageId(chatId);
         menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
         UserSession.removeApplication(chatId);
     }
@@ -511,7 +543,10 @@ public class HandleService {
             sendMessage.setText("Выберите одну из функций ниже: ");
         sendMessage.setReplyMarkup(markupService.basketFunctionInlineMarkup(chatId));
         userService.updateUserState(chatId, UserState.FUNCTION_BASKET);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        Thread.sleep(3000);
+        removeMessage(chatId, bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -525,7 +560,9 @@ public class HandleService {
             else if (userService.getLanguage(chatId).get().equals(Language.RUS))
                 sendMessage.setText("*Выбранные услуги недоступны*‼️");
             sendMessage.setParseMode("Markdown");
-            bot.execute(sendMessage);
+            removeMessage(chatId, bot);
+            Message message = bot.execute(sendMessage);
+            UserSession.updateUserMessageId(chatId, message.getMessageId());
             basketMessageHandler(chatId, bot);
             return;
         }
@@ -535,7 +572,9 @@ public class HandleService {
             sendMessage.setText("Услуги, которые вы выбираете: ");
         sendMessage.setReplyMarkup(markupService.selectServiceListInBasketFunctionInlineMarkup(chatId, basket));
         userService.updateUserState(chatId, UserState.FUNCTION_BASKET_SELECTED_SERVICE);
-        bot.execute(sendMessage);
+        removeMessage(chatId, bot);
+        Message message = bot.execute(sendMessage);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     public boolean checkData(String data) {
@@ -563,7 +602,9 @@ public class HandleService {
             sendMessage.setText("*Корзина очищена*‼️");
         sendMessage.setParseMode("Markdown");
         userService.updateUserState(chatId, UserState.FUNCTION_BASKET);
-        bot.execute(sendMessage);
+        removeMessage(chatId, bot);
+        Message message = bot.execute(sendMessage);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
         basketMessageHandler(chatId, bot);
     }
 
@@ -576,7 +617,8 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Введите свое полное имя (Ф.И.O): ");
         userService.updateUserState(chatId, UserState.COMMERCIAL_FULL_NAME);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        UserSession.updateSpecialMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -589,7 +631,8 @@ public class HandleService {
             sendMessage.setText("Введите номер телефона: ");
         commercialService.updateFullName(fullName, chatId);
         userService.updateUserState(chatId, UserState.COMMERCIAL_PHONE_NUMBER);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        UserSession.updateSpecialMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -616,7 +659,9 @@ public class HandleService {
             sendMessage.setText("Выберите интересующие вас услуги: ");
         sendMessage.setReplyMarkup(markupService.interestedServiceInlineMarkup(chatId));
         userService.updateUserState(chatId, UserState.COMMERCIAL_SERVICE);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        removeMessage(chatId, bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     @SneakyThrows
@@ -630,7 +675,10 @@ public class HandleService {
         sendMessage.setParseMode("Markdown");
         sendMessage.setReplyMarkup(markupService.commercialOfferButtonsInlineKeyboardMarkup(chatId));
         userService.updateUserState(chatId, UserState.COMMERCIAL_OLD_SERVICE);
-        bot.execute(sendMessage);
+        Message message = bot.execute(sendMessage);
+        removeSpecialMessage(chatId, bot);
+        removeMessage(chatId, bot);
+        UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
     private String formatBasketService(Set<String> services) {
@@ -687,6 +735,7 @@ public class HandleService {
         sendMessage.setReplyMarkup(markupService.sendToUserAppButtonsInlineMarkup(chatId));
         userService.updateUserState(chatId, UserState.COMMERCIAL_SEND_USER);
         bot.execute(sendMessage);
+        removeMessage(chatId, bot);
     }
 
     @SneakyThrows
@@ -722,6 +771,90 @@ public class HandleService {
         basketService.deleteByChatId(chatId);//Agar user tijorat taklifini yuborib bo'lgach savat avtofat tozalanib ketishi kerak bo'lsa
     }
 
+//    @SneakyThrows
+//    public void removeMessage(Long chatId, TelegramLongPollingBot bot) {
+//        Integer messageId = UserSession.getUserMessageId(chatId);
+//        if (messageId != null) {
+//            DeleteMessage deleteMessage = new DeleteMessage();
+//            deleteMessage.setChatId(chatId);
+//            deleteMessage.setMessageId(messageId);
+//            bot.execute(deleteMessage);
+//            UserSession.removeUserMessageId(chatId);
+//        }
+//    }
+
+
+    @SneakyThrows
+    public void removeMessage(Long chatId, TelegramLongPollingBot bot) {
+        Integer messageId = UserSession.getUserMessageId(chatId);
+        if (messageId != null) {
+            try {
+                DeleteMessage deleteMessage = new DeleteMessage();
+                deleteMessage.setChatId(chatId.toString());
+                deleteMessage.setMessageId(messageId);
+                bot.execute(deleteMessage);
+                UserSession.removeUserMessageId(chatId);
+            } catch (TelegramApiRequestException e) {
+                if (e.getErrorCode() == 400 && e.getApiResponse().contains("message to delete not found")) {
+                    System.out.println("Xabar allaqachon o'chirilgan yoki topilmadi: " + messageId);
+                    UserSession.removeUserMessageId(chatId);
+                } else {
+                    throw e;
+                }
+            }
+        }
+    }
+
+    @SneakyThrows
+    public void removeUserWriteMessage(Long chatId, TelegramLongPollingBot bot) {
+        Integer messageId = UserSession.getUserWriteMessageId(chatId);
+        if (messageId != null) {
+            try {
+                DeleteMessage deleteMessage = new DeleteMessage();
+                deleteMessage.setChatId(chatId.toString());
+                deleteMessage.setMessageId(messageId);
+                bot.execute(deleteMessage);
+                UserSession.removeUserMessageId(chatId);
+            } catch (TelegramApiRequestException e) {
+                if (e.getErrorCode() == 400 && e.getApiResponse().contains("message to delete not found")) {
+                    System.out.println("Xabar allaqachon o'chirilgan yoki topilmadi: " + messageId);
+                    UserSession.removeUserMessageId(chatId);
+                } else {
+                    throw e;
+                }
+            }
+        }
+    }
+
+
+    @SneakyThrows
+    public void removeSpecialMessage(Long chatId, TelegramLongPollingBot bot) {
+        List<Integer> specialMessageId = UserSession.getSpecialMessageId(chatId);
+        if (specialMessageId == null || specialMessageId.isEmpty())
+            return;
+        for (Integer messageId : specialMessageId) {
+            DeleteMessage deleteMessage = new DeleteMessage();
+            deleteMessage.setChatId(chatId);
+            deleteMessage.setMessageId(messageId);
+            bot.execute(deleteMessage);
+        }
+        UserSession.removeSpecialMessageIdList(chatId);
+    }
+
+    @SneakyThrows
+    public void removeAppSpecialMessage(Long chatId, TelegramLongPollingBot bot) {
+        List<Integer> appMessageIds = UserSession.getAppMessageIds(chatId);
+        if (appMessageIds == null || appMessageIds.isEmpty())
+            return;
+        for (Integer messageId : appMessageIds) {
+            DeleteMessage deleteMessage = new DeleteMessage();
+            deleteMessage.setChatId(chatId);
+            deleteMessage.setMessageId(messageId);
+            bot.execute(deleteMessage);
+        }
+        UserSession.removeAppMessageIdList(chatId);
+    }
+
     private void sendCommercialOfferToCompanyGroupMessageHandler(TelegramLongPollingBot bot, CommercialOffer commercialOffer) throws TelegramApiException {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(GROUP_CHAT_ID);
@@ -734,8 +867,38 @@ public class HandleService {
         sendMessage.setParseMode("Markdown");
         bot.execute(sendMessage);
 
+        String jsonBody = createNotionJsonCommercialOffer(commercialOffer);
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request1 = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.notion.com/v1/pages"))
+                .header("Authorization", "Bearer " + "secret_hPZQBlyCfxVGgg1srKYpwZKiZKfQtqACkq0WyhXenXd")
+                .header("Content-Type", "application/json")
+                .header("Notion-Version", "2022-06-28")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
 
+        try {
+            client.send(request1, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    public String createNotionJsonCommercialOffer(CommercialOffer offer) {
+        return "{"
+                + "\"parent\": { \"database_id\": \"" + "cf24a83b587a464389a730fbdf0679f8" + "\" },"
+                + "\"properties\": {"
+                + "\"Name\": {"
+                + "\"title\": [{ \"text\": { \"content\": \"" + escapeJson(offer.getFullName()) + "\" } }]"
+                + "},"
+                + "\"Type of Service\": {"
+                + "\"rich_text\": [{ \"text\": { \"content\": \"" + escapeJson(offer.getService().toString()) + "\" } }]"
+                + "},"
+                + "\"Phone\": {"
+                + "\"phone_number\": \"" + offer.getPhoneNumber() + "\""
+                + "}"
+                + "}"
+                + "}";
+    }
 
 }

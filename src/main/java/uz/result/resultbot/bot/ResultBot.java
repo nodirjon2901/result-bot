@@ -48,7 +48,20 @@ public class ResultBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
             Long chatId = update.getMessage().getChatId();
+            Integer messageId = update.getMessage().getMessageId();
             UserState currentState = userService.getUserState(chatId);
+
+            if (currentState.equals(UserState.COMMERCIAL_FULL_NAME) || currentState.equals(UserState.COMMERCIAL_PHONE_NUMBER)) {
+                UserSession.updateSpecialMessageId(chatId, messageId);
+            }
+            if (currentState.equals(UserState.APP_FULL_NAME) || currentState.equals(UserState.APP_PHONE_NUMBER)) {
+                UserSession.updateAppMessageId(chatId, messageId);
+            }
+            if (!(currentState.equals(UserState.COMMERCIAL_FULL_NAME) || currentState.equals(UserState.COMMERCIAL_PHONE_NUMBER)||
+                    currentState.equals(UserState.APP_FULL_NAME) || currentState.equals(UserState.APP_PHONE_NUMBER))){
+                UserSession.updateUserWriteMessageId(chatId, update.getMessage().getMessageId());
+            }
+
             if (update.getMessage().hasText()) {
                 String text = update.getMessage().getText();
                 if (userService.existsByChatId(chatId)) {

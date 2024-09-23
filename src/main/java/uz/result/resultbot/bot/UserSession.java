@@ -4,6 +4,8 @@ import uz.result.resultbot.model.Application;
 import uz.result.resultbot.model.Basket;
 import uz.result.resultbot.model.CommercialOffer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserSession {
@@ -14,7 +16,75 @@ public class UserSession {
 
     private static final ConcurrentHashMap<Long, CommercialOffer> userCommercialOffer = new ConcurrentHashMap<>();
 
+    private static final ConcurrentHashMap<Long, Integer> userMessageChatId = new ConcurrentHashMap<>();
 
+    private static final ConcurrentHashMap<Long, Integer> userWriteMessageChatId=new ConcurrentHashMap<>();
+
+    private static final ConcurrentHashMap<Long, List<Integer>> userSpecialMessageIds = new ConcurrentHashMap<>();
+
+    private static final ConcurrentHashMap<Long, List<Integer>> userAppMessageIds = new ConcurrentHashMap<>();
+
+    public static void updateUserWriteMessageId(Long chatId, Integer messageId) {
+        userWriteMessageChatId.put(chatId, messageId);
+    }
+
+    public static Integer getUserWriteMessageId(Long chatId) {
+        return userWriteMessageChatId.getOrDefault(chatId, null);
+    }
+
+    public static void removeUserWriteMessageId(Long chatId) {
+        userWriteMessageChatId.remove(chatId);
+    }
+
+    public static void updateAppMessageId(Long chatId, Integer messageId) {
+        List<Integer> integerList = userAppMessageIds.getOrDefault(chatId, new ArrayList<>());
+        integerList.add(messageId);
+        userAppMessageIds.put(chatId, integerList);
+    }
+
+    public static List<Integer> getAppMessageIds(Long chatId) {
+        return userAppMessageIds.get(chatId);
+    }
+
+    public static void removeAppMessageIdList(Long chatId) {
+        userAppMessageIds.remove(chatId);
+    }
+
+    public static void updateSpecialMessageId(Long chatId, Integer messageId) {
+        List<Integer> integerList = userSpecialMessageIds.getOrDefault(chatId, new ArrayList<>());
+        integerList.add(messageId);
+        userSpecialMessageIds.put(chatId, integerList);
+    }
+
+    public static List<Integer> getSpecialMessageId(Long chatId) {
+        return userSpecialMessageIds.get(chatId);
+    }
+
+    public static void removeSpecialMessageIdList(Long chatId) {
+        userSpecialMessageIds.remove(chatId);
+    }
+
+    public static void removeSpecialOneMessageId(Long chatId, Integer messageId) {
+        List<Integer> list = getSpecialMessageId(chatId);
+        if (list != null && !list.isEmpty()) {
+            boolean remove = list.remove(messageId);
+            if (!remove) {
+                System.out.println("MessageId is not found with id: " + messageId);
+            }
+        }
+    }
+
+    public static void updateUserMessageId(Long chatId, Integer messageId) {
+        userMessageChatId.put(chatId, messageId);
+    }
+
+    public static Integer getUserMessageId(Long chatId) {
+        return userMessageChatId.getOrDefault(chatId, null);
+    }
+
+    public static void removeUserMessageId(Long chatId) {
+        userMessageChatId.remove(chatId);
+    }
 
     public static void updateUserApplication(Long chatId, Application application) {
         userApplication.put(chatId, application);
@@ -28,7 +98,7 @@ public class UserSession {
         userApplication.remove(chatId);
     }
 
-    public static void updateBasket(Long chatId, Basket basket){
+    public static void updateBasket(Long chatId, Basket basket) {
         userBasket.put(chatId, basket);
     }
 
