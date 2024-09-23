@@ -42,10 +42,6 @@ public class UserService {
                 });
     }
 
-    public UserState getUserState(Long chatId) {
-        return userRepository.findUserStateByChatId(chatId).orElse(UserState.DEFAULT);
-    }
-
     public Future<Language> getLanguage(Long chatId) {
         return executorService.submit(userRepository.findByChatId(chatId)
                 .orElseThrow(() -> {
@@ -54,12 +50,10 @@ public class UserService {
                 })::getLanguage);
     }
 
-    public UserState updateUserState(Long chatId, UserState state) {
+    public void updateUserState(Long chatId, UserState state) {
         if (existsByChatId(chatId)) {
             userRepository.updateState(chatId, state.name());
-            return state;
         }
-        return getUserState(chatId);
     }
 
     public boolean existsByChatId(Long chatId) {

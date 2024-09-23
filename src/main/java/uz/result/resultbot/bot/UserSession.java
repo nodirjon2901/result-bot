@@ -1,9 +1,6 @@
 package uz.result.resultbot.bot;
 
-import uz.result.resultbot.model.Application;
-import uz.result.resultbot.model.Basket;
-import uz.result.resultbot.model.CommercialOffer;
-import uz.result.resultbot.model.UserState;
+import uz.result.resultbot.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +25,8 @@ public class UserSession {
     private static final ConcurrentHashMap<Long, UserState> userStates = new ConcurrentHashMap<>();
 
     public static UserState updateUserState(Long chatId, UserState userState) {
-         userStates.put(chatId, userState);
-         return userState;
+        userStates.put(chatId, userState);
+        return userState;
     }
 
     public static UserState getUserStateTemporary(Long chatId) {
