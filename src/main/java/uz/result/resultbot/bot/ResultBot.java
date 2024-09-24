@@ -71,11 +71,38 @@ public class ResultBot extends TelegramLongPollingBot {
                         UserSession.removeApplication(chatId);
                     }
                 }
+                switch (text) {
+                    case "Xizmatlar \uD83D\uDCC8", "Услуги \uD83D\uDCC8": {
+                        handleService.serviceSelectFunctionMessageHandler(chatId, this);
+                        return;
+                    }
+                    case "Ariza qoldirish ✍️", "Оставить заявку ✍️": {
+                        handleService.applicationMessageHandler(chatId, this);
+                        return;
+                    }
+
+                    case "Savat 🛒", "Корзина 🛒": {
+                        handleService.basketMessageHandler(chatId, this);
+                        return;
+                    }
+                    case "Orqaga 🔙", "Назад 🔙": {
+                        handleService.backOperationMessageHandler(chatId, this);
+                        return;
+                    }
+                    case "Bog'lanish 👨🏼‍💻", "Связаться 👨🏼‍💻": {
+                        handleService.contactMessageHandler(chatId, this);
+                        return;
+                    }
+                    case "Bizning kanal \uD83D\uDC49", "Наш канал \uD83D\uDC49": {
+                        handleService.ourChannelMessageHandler(chatId, this);
+                        return;
+                    }
+                }
                 switch (currentState) {
                     case DEFAULT -> handleService.defaultMessageHandler(chatId, text, this);
                     case START -> handleService.startMessageHandler(chatId, this);
-                    case SELECT_FUNCTION ->
-                            handleService.menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), this);
+//                    case SELECT_FUNCTION ->
+//                            handleService.menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), this);
                     case FUNCTION_SERVICE -> handleService.serviceSelectFunctionMessageHandler(chatId, this);
                     case SERVICE_SITE -> handleService.siteServiceMessageHandler(chatId, this);
                     case SERVICE_BOT -> handleService.botServiceMessageHandler(chatId, this);
@@ -113,14 +140,14 @@ public class ResultBot extends TelegramLongPollingBot {
                     handleService.menuMessageHandler(chatId, data, this);
                     basketService.deleteByChatId(chatId);
                 }
-                case SELECT_FUNCTION -> {
-                    switch (data) {
-                        case "services" -> handleService.serviceSelectFunctionMessageHandler(chatId, this);
-                        case "application" -> handleService.applicationMessageHandler(chatId, this);
-                        case "basket" -> handleService.basketMessageHandler(chatId, this);
-                        case "back" -> handleService.backOperationMessageHandler(chatId, this);
-                    }
-                }
+//                case SELECT_FUNCTION -> {
+//                    switch (data) {
+//                        case "services" -> handleService.serviceSelectFunctionMessageHandler(chatId, this);
+//                        case "application" -> handleService.applicationMessageHandler(chatId, this);
+//                        case "basket" -> handleService.basketMessageHandler(chatId, this);
+//                        case "back" -> handleService.backOperationMessageHandler(chatId, this);
+//                    }
+//                }
                 case FUNCTION_SERVICE -> {
                     switch (data) {
                         case "site" -> handleService.siteServiceMessageHandler(chatId, this);

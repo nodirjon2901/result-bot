@@ -16,6 +16,8 @@ public class UserSession {
 
     private static final ConcurrentHashMap<Long, Integer> userMessageChatId = new ConcurrentHashMap<>();
 
+    private static final ConcurrentHashMap<Long, Integer> userWarningMessageChatId = new ConcurrentHashMap<>();
+
     private static final ConcurrentHashMap<Long, Integer> userWriteMessageChatId = new ConcurrentHashMap<>();
 
     private static final ConcurrentHashMap<Long, List<Integer>> userSpecialMessageIds = new ConcurrentHashMap<>();
@@ -86,6 +88,18 @@ public class UserSession {
 
     public static void updateUserMessageId(Long chatId, Integer messageId) {
         userMessageChatId.put(chatId, messageId);
+    }
+
+    public static void updateUserWarningMessageId(Long chatId, Integer messageId) {
+        userWarningMessageChatId.put(chatId, messageId);
+    }
+
+    public static void removeUserWarningMessageId(Long chatId) {
+        userWarningMessageChatId.remove(chatId);
+    }
+
+    public static Integer getUserWarningMessageId(Long chatId) {
+        return userWarningMessageChatId.getOrDefault(chatId, null);
     }
 
     public static Integer getUserMessageId(Long chatId) {

@@ -111,13 +111,15 @@ public class HandleService {
             sendMessage.setText("Marhamat quyidagi funksiyalardan birini tanlang");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Пожалуйста, выберите одну из функций ниже");
-        sendMessage.setReplyMarkup(markupService.functionInlineMarkup(chatId));
+//        sendMessage.setReplyMarkup(markupService.functionInlineMarkup(chatId));
+        sendMessage.setReplyMarkup(markupService.functionReplyMarkup(chatId));
         if (!UserSession.getUserStateTemporary(chatId).equals(UserState.COMMERCIAL_SEND_USER)) {
             removeMessage(chatId, bot);
         }
         UserSession.updateUserState(chatId, UserState.SELECT_FUNCTION);
         Message message = bot.execute(sendMessage);
         removeUserWriteMessage(chatId, bot);
+        removeWarningMessage(chatId, bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
@@ -167,10 +169,14 @@ public class HandleService {
             sendMessage.setText("Bizning xizmatlar");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Наши услуги");
+        sendMessage.setReplyMarkup(markupService.replyKeyboardRemove());
         sendMessage.setReplyMarkup(markupService.serviceInlineMarkup(chatId));
         UserSession.updateUserState(chatId, UserState.FUNCTION_SERVICE);
         Message message = bot.execute(sendMessage);
+        removeMessage(chatId,bot);
+        removeUserWriteMessage(chatId,bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
+
     }
 
     @SneakyThrows
@@ -287,6 +293,7 @@ public class HandleService {
         UserSession.updateUserState(chatId, UserState.APP_FULL_NAME);
         Message message = bot.execute(sendMessage);
         removeMessage(chatId, bot);
+        removeUserWriteMessage(chatId,bot);
         UserSession.updateAppMessageId(chatId, message.getMessageId());
     }
 
@@ -549,8 +556,9 @@ public class HandleService {
         sendMessage.setReplyMarkup(markupService.basketFunctionInlineMarkup(chatId));
         UserSession.updateUserState(chatId, UserState.FUNCTION_BASKET);
         Message message = bot.execute(sendMessage);
-        Thread.sleep(3000);
-        removeMessage(chatId, bot);
+        removeMessage(chatId,bot);
+        removeUserWriteMessage(chatId,bot);
+//        Thread.sleep(3000);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
@@ -567,7 +575,7 @@ public class HandleService {
             sendMessage.setParseMode("Markdown");
             removeMessage(chatId, bot);
             Message message = bot.execute(sendMessage);
-            UserSession.updateUserMessageId(chatId, message.getMessageId());
+            UserSession.updateUserWarningMessageId(chatId, message.getMessageId());
             basketMessageHandler(chatId, bot);
             return;
         }
@@ -609,7 +617,7 @@ public class HandleService {
         UserSession.updateUserState(chatId, UserState.FUNCTION_BASKET);
         removeMessage(chatId, bot);
         Message message = bot.execute(sendMessage);
-        UserSession.updateUserMessageId(chatId, message.getMessageId());
+        UserSession.updateUserWarningMessageId(chatId, message.getMessageId());
         basketMessageHandler(chatId, bot);
     }
 
@@ -801,6 +809,26 @@ public class HandleService {
     }
 
     @SneakyThrows
+    private void removeWarningMessage(Long chatId, TelegramLongPollingBot bot) {
+        Integer messageId = UserSession.getUserWarningMessageId(chatId);
+        if (messageId != null) {
+            try {
+                DeleteMessage deleteMessage = new DeleteMessage();
+                deleteMessage.setChatId(chatId.toString());
+                deleteMessage.setMessageId(messageId);
+                bot.execute(deleteMessage);
+                UserSession.removeUserWarningMessageId(chatId);
+            } catch (TelegramApiRequestException e) {
+                if (e.getErrorCode() == 400 && e.getApiResponse().contains("message to delete not found")) {
+                    UserSession.removeUserMessageId(chatId);
+                } else {
+                    throw e;
+                }
+            }
+        }
+    }
+
+    @SneakyThrows
     private void removeUserWriteMessage(Long chatId, TelegramLongPollingBot bot) {
         Integer messageId = UserSession.getUserWriteMessageId(chatId);
         if (messageId != null) {
@@ -895,4 +923,29 @@ public class HandleService {
                 + "}";
     }
 
+    @SneakyThrows
+    public void contactMessageHandler(Long chatId, TelegramLongPollingBot bot) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        if (userService.getLanguage(chatId).get().equals(Language.UZB))
+            sendMessage.setText("Biz bilan bog'lanish uchun \uD83D\uDC49 t.me/result_man");
+        else if (userService.getLanguage(chatId).get().equals(Language.RUS))
+            sendMessage.setText("Чтобы связаться с нами \uD83D\uDC49 t.me/result_man");
+        bot.execute(sendMessage);
+//        removeMessage(chatId, bot);
+        menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
+    }
+
+    @SneakyThrows
+    public void ourChannelMessageHandler(Long chatId, TelegramLongPollingBot bot) {
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        if (userService.getLanguage(chatId).get().equals(Language.UZB))
+            sendMessage.setText("Bizning telegram kanalimiz \uD83D\uDC49 t.me/result_med");
+        else if (userService.getLanguage(chatId).get().equals(Language.RUS))
+            sendMessage.setText("Наш телеграм-канал \uD83D\uDC49 t.me/result_med");
+        bot.execute(sendMessage);
+//        removeMessage(chatId, bot);
+        menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
+    }
 }
