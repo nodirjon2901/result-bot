@@ -58,7 +58,7 @@ public class ResultBot extends TelegramLongPollingBot {
                 UserSession.updateAppMessageId(chatId, messageId);
             }
             if (!(currentState.equals(UserState.COMMERCIAL_FULL_NAME) || currentState.equals(UserState.COMMERCIAL_PHONE_NUMBER) ||
-                    currentState.equals(UserState.APP_FULL_NAME) || currentState.equals(UserState.APP_PHONE_NUMBER))) {
+                    currentState.equals(UserState.APP_FULL_NAME) || currentState.equals(UserState.APP_PHONE_NUMBER) || update.getMessage().getText().equals("/start"))) {
                 UserSession.updateUserWriteMessageId(chatId, update.getMessage().getMessageId());
             }
 
