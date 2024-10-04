@@ -24,22 +24,7 @@ public class UserSession {
 
     private static final ConcurrentHashMap<Long, List<Integer>> userAppMessageIds = new ConcurrentHashMap<>();
 
-    private static final ConcurrentHashMap<Long, Integer> userWarningMessageChatId = new ConcurrentHashMap<>();
-
     private static final ConcurrentHashMap<Long, UserState> userStates = new ConcurrentHashMap<>();
-
-    public static void updateUserWarningMessageId(Long chatId, Integer messageId) {
-        userWarningMessageChatId.put(chatId, messageId);
-    }
-
-    public static void removeUserWarningMessageId(Long chatId) {
-        userWarningMessageChatId.remove(chatId);
-    }
-
-    public static Integer getUserWarningMessageId(Long chatId) {
-        return userWarningMessageChatId.getOrDefault(chatId, null);
-    }
-
 
     public static UserState updateUserState(Long chatId, UserState userState) {
         userStates.put(chatId, userState);
