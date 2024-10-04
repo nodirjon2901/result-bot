@@ -111,7 +111,6 @@ public class HandleService {
             sendMessage.setText("Marhamat quyidagi funksiyalardan birini tanlang");
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Пожалуйста, выберите одну из функций ниже");
-//        sendMessage.setReplyMarkup(markupService.functionInlineMarkup(chatId));
         sendMessage.setReplyMarkup(markupService.functionReplyMarkup(chatId));
         if (!UserSession.getUserStateTemporary(chatId).equals(UserState.COMMERCIAL_SEND_USER)) {
             removeMessage(chatId, bot);
@@ -122,7 +121,6 @@ public class HandleService {
         removeWarningMessage(chatId, bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
-
 
     @SneakyThrows
     public void backOperationMessageHandler(Long chatId, TelegramLongPollingBot bot) {
@@ -170,7 +168,7 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Наши услуги");
         sendMessage.setReplyMarkup(markupService.replyKeyboardRemove());
-        sendMessage.setReplyMarkup(markupService.serviceInlineMarkup(chatId));
+        sendMessage.setReplyMarkup(markupService.serviceReplyMarkup(chatId));
         UserSession.updateUserState(chatId, UserState.FUNCTION_SERVICE);
         Message message = bot.execute(sendMessage);
         removeMessage(chatId,bot);
@@ -382,7 +380,6 @@ public class HandleService {
         return text.toString();
     }
 
-
     @SneakyThrows
     public void sendToUserApplicationMessageHandler(Long chatId, TelegramLongPollingBot bot) {
         SendMessage sendMessage = new SendMessage();
@@ -468,9 +465,6 @@ public class HandleService {
 
     }
 
-
-    //
-
     private String createNotionJson(Application application) {
         return "{"
                 + "\"parent\": { \"database_id\": \"" + "2b43ccc3b4af4e53a8e6802fb3f7fcfb" + "\" },"
@@ -488,7 +482,6 @@ public class HandleService {
                 + "}";
     }
 
-
     private static String escapeJson(String value) {
         if (value == null) {
             return null;
@@ -503,8 +496,6 @@ public class HandleService {
                 .replace("\r", "\\r")
                 .replace("\t", "\\t");
     }
-
-    //
 
     @SneakyThrows
     public void basketOperationMessageHandler(Long chatId, TelegramLongPollingBot bot) {
@@ -558,7 +549,6 @@ public class HandleService {
         Message message = bot.execute(sendMessage);
         removeMessage(chatId,bot);
         removeUserWriteMessage(chatId,bot);
-//        Thread.sleep(3000);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
@@ -574,6 +564,7 @@ public class HandleService {
                 sendMessage.setText("*Выбранные услуги недоступны*‼️");
             sendMessage.setParseMode("Markdown");
             removeMessage(chatId, bot);
+            removeWarningMessage(chatId,bot);
             Message message = bot.execute(sendMessage);
             UserSession.updateUserWarningMessageId(chatId, message.getMessageId());
             basketMessageHandler(chatId, bot);
@@ -932,7 +923,6 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Чтобы связаться с нами \uD83D\uDC49 t.me/result_man");
         bot.execute(sendMessage);
-//        removeMessage(chatId, bot);
         menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
     }
 
@@ -945,7 +935,6 @@ public class HandleService {
         else if (userService.getLanguage(chatId).get().equals(Language.RUS))
             sendMessage.setText("Наш телеграм-канал \uD83D\uDC49 t.me/result_med");
         bot.execute(sendMessage);
-//        removeMessage(chatId, bot);
         menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), bot);
     }
 }

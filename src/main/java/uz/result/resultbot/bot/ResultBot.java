@@ -71,39 +71,74 @@ public class ResultBot extends TelegramLongPollingBot {
                         UserSession.removeApplication(chatId);
                     }
                 }
-                switch (text) {
-                    case "Xizmatlar \uD83D\uDCC8", "Услуги \uD83D\uDCC8": {
-                        handleService.serviceSelectFunctionMessageHandler(chatId, this);
-                        return;
-                    }
-                    case "Ariza qoldirish ✍️", "Оставить заявку ✍️": {
-                        handleService.applicationMessageHandler(chatId, this);
-                        return;
-                    }
-
-                    case "Savat 🛒", "Корзина 🛒": {
-                        handleService.basketMessageHandler(chatId, this);
-                        return;
-                    }
-                    case "Orqaga 🔙", "Назад 🔙": {
-                        handleService.backOperationMessageHandler(chatId, this);
-                        return;
-                    }
-                    case "Bog'lanish 👨🏼‍💻", "Связаться 👨🏼‍💻": {
-                        handleService.contactMessageHandler(chatId, this);
-                        return;
-                    }
-                    case "Bizning kanal \uD83D\uDC49", "Наш канал \uD83D\uDC49": {
-                        handleService.ourChannelMessageHandler(chatId, this);
-                        return;
-                    }
-                }
                 switch (currentState) {
                     case DEFAULT -> handleService.defaultMessageHandler(chatId, text, this);
                     case START -> handleService.startMessageHandler(chatId, this);
-//                    case SELECT_FUNCTION ->
-//                            handleService.menuMessageHandler(chatId, userService.getLanguage(chatId).get().name(), this);
-                    case FUNCTION_SERVICE -> handleService.serviceSelectFunctionMessageHandler(chatId, this);
+                    case SELECT_FUNCTION ->{
+                        switch (text) {
+                            case "Xizmatlar \uD83D\uDCC8", "Услуги \uD83D\uDCC8": {
+                                handleService.serviceSelectFunctionMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "Ariza qoldirish ✍️", "Оставить заявку ✍️": {
+                                handleService.applicationMessageHandler(chatId, this);
+                                return;
+                            }
+
+                            case "Savat 🛒", "Корзина 🛒": {
+                                handleService.basketMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "Orqaga 🔙", "Назад 🔙": {
+                                handleService.backOperationMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "Bog'lanish 👨🏼‍💻", "Связаться 👨🏼‍💻": {
+                                handleService.contactMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "Bizning kanal \uD83D\uDC49", "Наш канал \uD83D\uDC49": {
+                                handleService.ourChannelMessageHandler(chatId, this);
+                                return;
+                            }
+                        }
+                    }
+                    case FUNCTION_SERVICE -> {
+                        switch (text) {
+                            case "Saytlar \uD83D\uDDA5", "Сайты \uD83D\uDDA5": {
+                                handleService.siteServiceMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "Telegram-botlar \uD83D\uDCF2", "Telegram-боты \uD83D\uDCF2": {
+                                handleService.botServiceMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "SMM \uD83D\uDCF1": {
+                                handleService.smmServiceMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "Reklama boshlash \uD83D\uDCB3","Запуск рекламы \uD83D\uDCB3": {
+                                handleService.advertisingServiceMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "SEO \uD83E\uDEAA": {
+                                handleService.seoServiceMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "Brending \uD83D\uDCA1", "Брендинг \uD83D\uDCA1": {
+                                handleService.brandingServiceMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "Savat \uD83D\uDED2", "Корзина \uD83D\uDED2": {
+                                handleService.basketMessageHandler(chatId, this);
+                                return;
+                            }
+                            case "Orqaga \uD83D\uDD19", "Назад \uD83D\uDD19": {
+                                handleService.backOperationMessageHandler(chatId, this);
+                                return;
+                            }
+                        }
+                    }
                     case SERVICE_SITE -> handleService.siteServiceMessageHandler(chatId, this);
                     case SERVICE_BOT -> handleService.botServiceMessageHandler(chatId, this);
                     case SERVICE_SMM -> handleService.smmServiceMessageHandler(chatId, this);
@@ -140,6 +175,7 @@ public class ResultBot extends TelegramLongPollingBot {
                     handleService.menuMessageHandler(chatId, data, this);
                     basketService.deleteByChatId(chatId);
                 }
+
 //                case SELECT_FUNCTION -> {
 //                    switch (data) {
 //                        case "services" -> handleService.serviceSelectFunctionMessageHandler(chatId, this);
@@ -148,17 +184,18 @@ public class ResultBot extends TelegramLongPollingBot {
 //                        case "back" -> handleService.backOperationMessageHandler(chatId, this);
 //                    }
 //                }
-                case FUNCTION_SERVICE -> {
-                    switch (data) {
-                        case "site" -> handleService.siteServiceMessageHandler(chatId, this);
-                        case "bot" -> handleService.botServiceMessageHandler(chatId, this);
-                        case "smm" -> handleService.smmServiceMessageHandler(chatId, this);
-                        case "advertising" -> handleService.advertisingServiceMessageHandler(chatId, this);
-                        case "seo" -> handleService.seoServiceMessageHandler(chatId, this);
-                        case "branding" -> handleService.brandingServiceMessageHandler(chatId, this);
-                        case "back" -> handleService.backOperationMessageHandler(chatId, this);
-                    }
-                }
+//                case FUNCTION_SERVICE -> {
+//                    switch (data) {
+//                        case "site" -> handleService.siteServiceMessageHandler(chatId, this);
+//                        case "bot" -> handleService.botServiceMessageHandler(chatId, this);
+//                        case "smm" -> handleService.smmServiceMessageHandler(chatId, this);
+//                        case "advertising" -> handleService.advertisingServiceMessageHandler(chatId, this);
+//                        case "seo" -> handleService.seoServiceMessageHandler(chatId, this);
+//                        case "branding" -> handleService.brandingServiceMessageHandler(chatId, this);
+//                        case "back" -> handleService.backOperationMessageHandler(chatId, this);
+//                    }
+//                }
+
                 case SERVICE_SITE, SERVICE_ADVERTISING, SERVICE_BOT, SERVICE_BRANDING, SERVICE_SEO, SERVICE_SMM -> {
                     switch (data) {
                         case "back" -> handleService.backOperationMessageHandler(chatId, this);
