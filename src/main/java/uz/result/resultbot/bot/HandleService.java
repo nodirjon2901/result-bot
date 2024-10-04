@@ -170,7 +170,7 @@ public class HandleService {
         sendMessage.setReplyMarkup(markupService.serviceInlineMarkup(chatId));
         UserSession.updateUserState(chatId, UserState.FUNCTION_SERVICE);
         Message message = bot.execute(sendMessage);
-        removeMessage(chatId,bot);// yangi qo'shildi =======================================================================
+        removeMessage(chatId, bot);// yangi qo'shildi =======================================================================
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
@@ -571,7 +571,8 @@ public class HandleService {
             sendMessage.setParseMode("Markdown");
             removeMessage(chatId, bot);
             Message message = bot.execute(sendMessage);
-            UserSession.updateUserMessageId(chatId, message.getMessageId());
+//            UserSession.updateUserMessageId(chatId, message.getMessageId());===========================================================================
+            UserSession.updateUserWarningMessageId(chatId, message.getMessageId());
             basketMessageHandler(chatId, bot);
             return;
         }
@@ -613,7 +614,8 @@ public class HandleService {
         UserSession.updateUserState(chatId, UserState.FUNCTION_BASKET);
         removeMessage(chatId, bot);
         Message message = bot.execute(sendMessage);
-        UserSession.updateUserMessageId(chatId, message.getMessageId());
+//        UserSession.updateUserMessageId(chatId, message.getMessageId());=======================================================================
+        UserSession.updateUserWarningMessageId(chatId, message.getMessageId());
         basketMessageHandler(chatId, bot);
     }
 
@@ -841,6 +843,26 @@ public class HandleService {
             bot.execute(deleteMessage);
         }
         UserSession.removeSpecialMessageIdList(chatId);
+    }
+
+    @SneakyThrows
+    private void removeWarningMessage(Long chatId, TelegramLongPollingBot bot) {
+        Integer messageId = UserSession.getUserWarningMessageId(chatId);
+        if (messageId != null) {
+            try {
+                DeleteMessage deleteMessage = new DeleteMessage();
+                deleteMessage.setChatId(chatId.toString());
+                deleteMessage.setMessageId(messageId);
+                bot.execute(deleteMessage);
+                UserSession.removeUserWarningMessageId(chatId);
+            } catch (TelegramApiRequestException e) {
+                if (e.getErrorCode() == 400 && e.getApiResponse().contains("message to delete not found")) {
+                    UserSession.removeUserMessageId(chatId);
+                } else {
+                    throw e;
+                }
+            }
+        }
     }
 
     @SneakyThrows
