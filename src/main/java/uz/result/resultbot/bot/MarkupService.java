@@ -75,19 +75,16 @@ public class MarkupService {
             buttonText6 = "Назад 🔙";
         }
 
-        // First row
         KeyboardRow row1 = new KeyboardRow();
         row1.add(new KeyboardButton(buttonText1));
         row1.add(new KeyboardButton(buttonText2));
         rows.add(row1);
 
-        // Second row
         KeyboardRow row2 = new KeyboardRow();
         row2.add(new KeyboardButton(buttonText3));
         row2.add(new KeyboardButton(buttonText4));
         rows.add(row2);
 
-        // Third row
         KeyboardRow row3 = new KeyboardRow();
         row3.add(new KeyboardButton(buttonText5));
         row3.add(new KeyboardButton(buttonText6));
@@ -133,19 +130,16 @@ public class MarkupService {
             buttonText8 = "Назад 🔙";
         }
 
-        // First row
         KeyboardRow row1 = new KeyboardRow();
         row1.add(new KeyboardButton(buttonText1));
         row1.add(new KeyboardButton(buttonText2));
         rows.add(row1);
 
-        // Second row
         KeyboardRow row2 = new KeyboardRow();
         row2.add(new KeyboardButton(buttonText3));
         row2.add(new KeyboardButton(buttonText4));
         rows.add(row2);
 
-        // Third row
         KeyboardRow row3 = new KeyboardRow();
         row3.add(new KeyboardButton(buttonText5));
         row3.add(new KeyboardButton(buttonText6));
@@ -159,79 +153,6 @@ public class MarkupService {
         replyKeyboard.setKeyboard(rows);
         return replyKeyboard;
     }
-
-//    public InlineKeyboardMarkup serviceInlineMarkup(Long chatId) throws ExecutionException, InterruptedException {
-//        InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
-//        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
-//        List<InlineKeyboardButton> buttonRow = new ArrayList<>();
-//
-//        String buttonText1 = "";
-//        String buttonText2 = "";
-//        String buttonText3 = "";
-//        String buttonText4 = "";
-//        String buttonText5 = "";
-//        String buttonText6 = "";
-//        String buttonText7 = "";
-//        if (userService.getLanguage(chatId).get().equals(Language.UZB)) {
-//            buttonText1 = "Saytlar";
-//            buttonText2 = "Telegram-botlar";
-//            buttonText3 = "SMM";
-//            buttonText4 = "Reklama boshlash";
-//            buttonText5 = "SEO";
-//            buttonText6 = "Brending";
-//            buttonText7 = "Orqaga 🔙";
-//        } else if (userService.getLanguage(chatId).get().equals(Language.RUS)) {
-//            buttonText1 = "Сайты";
-//            buttonText2 = "Telegram-боты";
-//            buttonText3 = "SMM";
-//            buttonText4 = "Запуск рекламы";
-//            buttonText5 = "SEO";
-//            buttonText6 = "Брендинг";
-//            buttonText7 = "Назад 🔙";
-//        }
-//        InlineKeyboardButton button = new InlineKeyboardButton();
-//        button.setText(buttonText1);
-//        button.setCallbackData("site");
-//        buttonRow.add(button);
-//
-//        button = new InlineKeyboardButton();
-//        button.setText(buttonText2);
-//        button.setCallbackData("bot");
-//        buttonRow.add(button);
-//
-//        button = new InlineKeyboardButton();
-//        button.setText(buttonText3);
-//        button.setCallbackData("smm");
-//        buttonRow.add(button);
-//        rowsInline.add(buttonRow);
-//
-//        buttonRow = new ArrayList<>();
-//        button = new InlineKeyboardButton();
-//        button.setText(buttonText4);
-//        button.setCallbackData("advertising");
-//        buttonRow.add(button);
-//
-//        button = new InlineKeyboardButton();
-//        button.setText(buttonText5);
-//        button.setCallbackData("seo");
-//        buttonRow.add(button);
-//
-//        button = new InlineKeyboardButton();
-//        button.setText(buttonText6);
-//        button.setCallbackData("branding");
-//        buttonRow.add(button);
-//        rowsInline.add(buttonRow);
-//
-//        buttonRow = new ArrayList<>();
-//        button = new InlineKeyboardButton();
-//        button.setText(buttonText7);
-//        button.setCallbackData("back");
-//        buttonRow.add(button);
-//        rowsInline.add(buttonRow);
-//
-//        inlineKeyboard.setKeyboard(rowsInline);
-//        return inlineKeyboard;
-//    }
 
     public ReplyKeyboard serviceButtonInlineKeyboardMarkup(Long chatId) throws ExecutionException, InterruptedException {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup();
