@@ -118,6 +118,7 @@ public class HandleService {
         UserSession.updateUserState(chatId, UserState.SELECT_FUNCTION);
         Message message = bot.execute(sendMessage);
         removeUserWriteMessage(chatId, bot);
+        removeWarningMessage(chatId, bot);//===========================================================================
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
 
@@ -553,7 +554,7 @@ public class HandleService {
         sendMessage.setReplyMarkup(markupService.basketFunctionInlineMarkup(chatId));
         UserSession.updateUserState(chatId, UserState.FUNCTION_BASKET);
         Message message = bot.execute(sendMessage);
-        Thread.sleep(3000);
+//        Thread.sleep(3000);===========================================================================================
         removeMessage(chatId, bot);
         UserSession.updateUserMessageId(chatId, message.getMessageId());
     }
